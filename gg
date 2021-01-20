@@ -1,0 +1,39 @@
+#!/bin/sh -e
+# ------------------------------------
+# Show the git commit-tree as a graph
+# ------------------------------------
+# Copyright (c) 2021 Johan Lundin
+# ------------------------------------
+
+args=
+commit_hash='%h'
+author_name=
+
+ALL=--all
+
+usage() {
+	echo "$0 [option]\n"
+	echo "Options:"
+	echo "-h: usage"
+	echo "-u: show commit user-names"
+	echo "-f: show full hash"
+	echo "-s: show --stat"
+	echo "-i: only show current branch"
+	echo "-p: show diff between commits"
+	exit 0
+}
+
+while getopts :uhfsi opt
+do
+	case $opt in
+	u)	author_name='%C(cyan)(%an)%C(reset)';;
+	f)	commit_hash='%H';;
+	h)	usage;;
+	s)	args="$args --stat";;
+	i)	ALL=;;
+	p)	args="$args -p";;
+	?)	args="$args -$OPTARG";;
+	esac
+done
+
+git log --graph --decorate --color $ALL --pretty=format:"%C(yellow)$commit_hash%Creset%C(white)%d%Creset %s $author_name" $args
